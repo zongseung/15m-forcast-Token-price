@@ -1,0 +1,6 @@
+# 환경 변수 파일
+.env
+**/.env      
+logs/
+*.log
+.cache/

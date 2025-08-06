@@ -1,0 +1,15 @@
+db:
+  url: jdbc:mysql://db:3306/hype_db
+  user: hype_user
+  pass: 1234
+
+model:
+  in_len: 720
+  out_len: 4
+
+search:
+  n_trials: 20
+  hid_dim: [32, 64, 128, 256]
+  n_layers: [1,2,3]
+  lr: [1e-4,3e-4,1e-3,3e-3]
+  batch_size: [16,32,64]

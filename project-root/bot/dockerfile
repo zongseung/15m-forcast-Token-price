@@ -1,0 +1,28 @@
+# project-root/bot/Dockerfile
+
+# 베이스 이미지
+FROM python:3.10-slim
+
+# 시스템 레벨 의존성 (필요하다면 추가)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+ && rm -rf /var/lib/apt/lists/*
+
+# 작업 디렉토리 설정
+WORKDIR /app
+
+# 호스트의 .env, bot 디렉토리 마운트 또는 복사
+# (docker-compose.yml에서 env_file: .env 로 처리)
+
+# 파이썬 라이브러리 설치
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Bot 소스 복사
+COPY . .
+
+# 실행 스크립트에 실행 권한
+RUN chmod +x run_cron.sh
+
+# 매 정각마다 run_cron.sh 를 실행하도록
+CMD ["./run_cron.sh"]

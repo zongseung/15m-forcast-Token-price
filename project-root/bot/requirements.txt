@@ -1,0 +1,9 @@
+discord.py>=1.7.3
+torch
+scikit-learn
+pandas
+matplotlib
+joblib
+python-dotenv
+sqlalchemy
+pymysql

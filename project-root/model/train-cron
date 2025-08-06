@@ -1,0 +1,2 @@
+0 * * * * root /app/train-cron.sh
+0,30 * * * * root /app/forecast-cron.sh

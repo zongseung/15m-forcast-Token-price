@@ -1,0 +1,82 @@
+version: '3.8'
+
+services:
+
+  db:
+    image: mysql:8.0
+    env_file:
+      - .env
+    environment:
+      MYSQL_DATABASE:       ${DB_NAME}
+      MYSQL_USER:           ${DB_USER}
+      MYSQL_PASSWORD:       ${DB_PASS}
+      MYSQL_ROOT_PASSWORD:  ${DB_PASS}
+    ports:
+      - "3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+
+  fetcher:
+    build: ./fetcher
+    env_file:
+      - .env
+    volumes:
+      - ./fetcher/src:/app/src
+      - ./database:/app/database
+      - ./fetcher/entrypoint.sh:/app/entrypoint.sh
+    entrypoint: ["/app/entrypoint.sh"]
+    depends_on:
+      - db
+
+  spark-job:
+    build: ./spark-job
+    env_file:
+      - .env
+    depends_on:
+      - db
+    volumes:
+      - ./spark-job/src:/app/src
+      - ./spark-job/libs/mysql-connector-j-8.3.0.jar:/opt/bitnami/spark/jars/mysql-connector-java.jar
+
+  model:
+    build:  ./model
+    env_file:
+      - ./model/.env
+    volumes:
+      - ./model/src:/app/src
+      - ./model/.env:/app/.env     # ✅ 이 줄 추가!
+      - ./model/config:/app/model/config
+      - ./model/output:/app/model/output
+
+    working_dir: /app/src
+    environment:
+      - PYTHONPATH=/app/src
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+    command: ["cron", "-f"]
+
+  bot:
+    build: ./bot
+    env_file:
+      - .env
+    volumes:
+      - ./bot:/app
+      - ./model/config:/app/model/config
+      - ./model/output:/app/model/output
+      - ./model/src:/app/src
+
+    working_dir: /app
+    environment:
+      - PYTHONPATH=/app:/app/src
+      - DISCORD_TOKEN=${DISCORD_TOKEN}
+    command: ["bash", "run_cron.sh"]
+    depends_on:
+      - model
+      - db
+
+volumes:
+  db_data:
+  model-output:
+
+
