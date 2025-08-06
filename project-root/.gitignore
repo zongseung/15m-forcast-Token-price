@@ -1,6 +1,16 @@
-# 환경 변수 파일
+# 환경 설정 파일
 .env
-**/.env      
-logs/
+config.yaml
+
+# 데이터 폴더
+daily/
+
+# 캐시 및 로그
+__pycache__/
 *.log
-.cache/
+
+# 가상환경
+.venv/
+
+# 시스템 파일
+.DS_Store
